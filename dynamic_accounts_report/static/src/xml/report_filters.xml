@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dynamic_accounts_report.ReportFilters">
+        <div class="o_dar_filters">
+            <!-- Companies -->
+            <div class="dropdown o_dar_filter"
+                 t-if="this.state.companies.options.length &gt; 1">
+                <button type="button" class="o_dar_chip" data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside" aria-expanded="false">
+                    <i class="fa fa-building-o"/>
+                    <span>Companies</span>
+                    <span class="o_dar_badge" t-out="this.state.companies.selectedIds.length"/>
+                </button>
+                <div class="dropdown-menu o_dar_menu">
+                    <t t-foreach="this.state.companies.options" t-as="company" t-key="company.id">
+                        <label class="o_dar_check">
+                            <input type="checkbox"
+                                   t-att-checked="this.isCompanySelected(company.id)"
+                                   t-on-change="() => this.toggleCompany(company.id)"/>
+                            <span t-out="company.name"/>
+                            <small class="text-muted" t-out="company.currency"/>
+                        </label>
+                    </t>
+                </div>
+            </div>
+            <span class="o_dar_warning" t-if="this.state.companies.mixedCurrency"
+                  title="The selected companies use different currencies: totals are simply added together, without conversion.">
+                <i class="fa fa-exclamation-triangle"/> Mixed currencies
+            </span>
+
+            <!-- Partners / Accounts -->
+            <t t-foreach="['partner', 'account']" t-as="kind" t-key="kind">
+                <div class="dropdown o_dar_filter"
+                     t-if="(kind === 'partner' and showPartner) or (kind === 'account' and showAccount)">
+                    <button type="button" class="o_dar_chip" data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside" aria-expanded="false">
+                        <i t-att-class="kind === 'partner' ? 'fa fa-users' : 'fa fa-book'"/>
+                        <span t-out="kind === 'partner' ? 'Partners' : 'Accounts'"/>
+                        <span class="o_dar_badge" t-if="this.selectedOf(kind).length"
+                              t-out="this.selectedOf(kind).length"/>
+                    </button>
+                    <div class="dropdown-menu o_dar_menu o_dar_search">
+                        <input type="search" class="form-control form-control-sm"
+                               autocomplete="off"
+                               t-att-placeholder="kind === 'partner' ? 'Search partner…' : 'Search account…'"
+                               t-on-input="(ev) => this.onSearch(kind, ev)"/>
+                        <div class="o_dar_results" t-if="this.state.filterUi.kind === kind and this.state.filterUi.results.length">
+                            <t t-foreach="this.state.filterUi.results" t-as="rec" t-key="rec.id">
+                                <button type="button" class="o_dar_result"
+                                        t-on-click="() => this.addRecord(kind, rec)"
+                                        t-out="rec.name"/>
+                            </t>
+                        </div>
+                        <div class="o_dar_hint" t-if="this.state.filterUi.kind === kind and this.state.filterUi.loading">…</div>
+                        <div class="o_dar_selected" t-if="this.selectedOf(kind).length">
+                            <t t-foreach="this.selectedOf(kind)" t-as="rec" t-key="rec.id">
+                                <span class="o_dar_tag">
+                                    <span t-out="rec.name"/>
+                                    <button type="button" aria-label="Remove"
+                                            t-on-click="() => this.removeRecord(kind, rec)">×</button>
+                                </span>
+                            </t>
+                            <button type="button" class="o_dar_clear"
+                                    t-on-click="() => this.clearFilter(kind)">Clear all</button>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>
