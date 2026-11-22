@@ -25,6 +25,47 @@ class ProductPricelist(models.Model):
              "(1 = nearest whole number).",
     )
 
+    sync_list_price = fields.Boolean(
+        string="Update Product Sale Price",
+        help="When enabled, the product Sales Price is kept equal to the fixed price of the "
+             "product's rule in this pricelist (rules applied on a product, without dates, "
+             "packaging or minimum quantity). Only one pricelist per company can do this and "
+             "its currency must be the company currency.",
+    )
+
+    _SYNC_TRIGGER_FIELDS = {'secondary_currency_id', 'currency_id', 'secondary_rounding'}
+
+    @api.constrains('sync_list_price', 'company_id', 'currency_id')
+    def _check_sync_list_price(self):
+        for pricelist in self.filtered('sync_list_price'):
+            company = pricelist.company_id or self.env.company
+            if pricelist.currency_id != company.currency_id:
+                raise ValidationError(self.env._(
+                    "The pricelist that updates product sale prices must use the company currency."
+                ))
+            others = self.with_context(active_test=False).search_count([
+                ('sync_list_price', '=', True),
+                ('company_id', '=', pricelist.company_id.id),
+                ('id', '!=', pricelist.id),
+            ])
+            if others:
+                raise ValidationError(self.env._(
+                    "Only one pricelist per company can update product sale prices."
+                ))
+
+    def write(self, vals):
+        res = super().write(vals)
+        if self._SYNC_TRIGGER_FIELDS & set(vals):
+            self.filtered('sync_list_price').item_ids._sync_list_price()
+        return res
+
+    def action_sync_list_price(self):
+        """Push the pricelist fixed prices to the product Sales Price now."""
+        for pricelist in self.filtered('sync_list_price'):
+            pricelist.item_ids._recompute_fixed_price()
+            pricelist.item_ids._sync_list_price()
+        return True
+
     @api.constrains('secondary_currency_id', 'currency_id')
     def _check_secondary_currency(self):
         for pricelist in self:

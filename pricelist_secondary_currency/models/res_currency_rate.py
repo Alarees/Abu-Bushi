@@ -18,6 +18,7 @@ class ResCurrencyRate(models.Model):
             ('pricelist_id.currency_id', 'in', currencies.ids),
         ])
         items._recompute_fixed_price()
+        items._sync_list_price()
 
     def _refresh_after_rate_change(self, currencies):
         self.env['res.currency.rate'].flush_model()

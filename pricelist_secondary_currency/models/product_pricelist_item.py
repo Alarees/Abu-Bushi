@@ -1,5 +1,5 @@
 from odoo import api, fields, models
-from odoo.tools import float_round
+from odoo.tools import float_compare, float_round
 
 
 class ProductPricelistItem(models.Model):
@@ -76,3 +76,54 @@ class ProductPricelistItem(models.Model):
             ('secondary_price', '!=', 0),
         ])
         items._recompute_fixed_price()
+        # Safety net: re-sync product sale prices from the master pricelist(s).
+        self.sudo().search([('pricelist_id.sync_list_price', '=', True)])._sync_list_price()
+
+    # ---- Product sale price synchronisation -------------------------------
+    _SYNC_TRIGGER_FIELDS = {
+        'secondary_price', 'fixed_price', 'compute_price', 'applied_on', 'product_tmpl_id',
+        'min_quantity', 'uom_id', 'date_start', 'date_end', 'pricelist_id',
+    }
+
+    def _is_list_price_source(self):
+        self.ensure_one()
+        pricelist = self.pricelist_id
+        return bool(
+            pricelist.sync_list_price
+            and pricelist.active
+            and self.compute_price == 'fixed'
+            and self.applied_on == '1_product'
+            and self.product_tmpl_id
+            and not self.date_start
+            and not self.date_end
+            and not self.uom_id
+            and self.min_quantity <= 1
+        )
+
+    def _sync_list_price(self):
+        """Write the fixed price of eligible rules on the product Sales Price."""
+        items = self.filtered(lambda i: i._is_list_price_source())
+        if not items:
+            return
+        source = {}
+        for item in items.sorted('id'):  # latest rule wins for a given product
+            source[item.product_tmpl_id] = item
+        for template, item in source.items():
+            price = item.fixed_price  # forces any pending recomputation
+            if price <= 0:
+                continue
+            rounding = item.currency_id.rounding or 0.01
+            if float_compare(template.list_price, price, precision_rounding=rounding):
+                template.sudo().write({'list_price': price})
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        items = super().create(vals_list)
+        items._sync_list_price()
+        return items
+
+    def write(self, vals):
+        res = super().write(vals)
+        if self._SYNC_TRIGGER_FIELDS & set(vals):
+            self._sync_list_price()
+        return res

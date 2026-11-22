@@ -10,6 +10,7 @@
                 <field name="secondary_currency_id" options="{'no_create': True}"/>
                 <field name="secondary_rate" invisible="not secondary_currency_id"/>
                 <field name="secondary_rounding" invisible="not secondary_currency_id"/>
+                <field name="sync_list_price"/>
                 <div colspan="2" invisible="not secondary_currency_id">
                     <button name="action_update_secondary_prices" type="object"
                             string="Update Prices Now" class="btn-secondary me-2"/>
@@ -17,6 +18,11 @@
                             string="Fill Secondary Prices from Current Prices"
                             class="btn-secondary"
                             confirm="Secondary prices will be filled from the current fixed prices for rules that have none. Continue?"/>
+                </div>
+                <div colspan="2" invisible="not sync_list_price">
+                    <button name="action_sync_list_price" type="object"
+                            string="Update Product Sale Prices Now" class="btn-secondary"
+                            confirm="The Sales Price of every product that has an eligible fixed-price rule in this pricelist will be overwritten. Continue?"/>
                 </div>
             </xpath>
             <xpath expr="//field[@name='item_ids']/list/field[@name='price']" position="before">

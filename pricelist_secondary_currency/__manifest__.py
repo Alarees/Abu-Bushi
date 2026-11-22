@@ -12,8 +12,10 @@ Pricelist Secondary Currency
 * When an exchange rate (res.currency.rate) is created, edited or deleted,
   all affected rules are recalculated automatically.
 * A daily cron also refreshes prices (covers future-dated rates).
+* Optional: one pricelist per company can push its fixed prices to the product
+  Sales Price (instantly on change, with a button and the daily cron).
 """,
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Sales/Sales',
     'license': 'LGPL-3',
     'author': 'Abu Bushi',
