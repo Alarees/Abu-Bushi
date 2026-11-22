@@ -22,7 +22,6 @@ class ProductPricelistItem(models.Model):
         compute='_compute_fixed_price',
         store=True,
         readonly=False,
-        precompute=True,
     )
 
     @api.depends(
