@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Pricelist form -->
+    <record id="product_pricelist_view_secondary_currency" model="ir.ui.view">
+        <field name="name">product.pricelist.form.secondary.currency</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='pricelist_settings']" position="inside">
+                <field name="secondary_currency_id" options="{'no_create': True}"/>
+                <field name="secondary_rate" invisible="not secondary_currency_id"/>
+                <field name="secondary_rounding" invisible="not secondary_currency_id"/>
+                <div colspan="2" invisible="not secondary_currency_id">
+                    <button name="action_update_secondary_prices" type="object"
+                            string="Update Prices Now" class="btn-secondary me-2"/>
+                    <button name="action_init_secondary_prices" type="object"
+                            string="Fill Secondary Prices from Current Prices"
+                            class="btn-secondary"
+                            confirm="Secondary prices will be filled from the current fixed prices for rules that have none. Continue?"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='item_ids']/list/field[@name='price']" position="before">
+                <field name="secondary_currency_id" column_invisible="True"/>
+                <field name="secondary_price" column_invisible="not parent.secondary_currency_id"
+                       widget="monetary" options="{'currency_field': 'secondary_currency_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rule form -->
+    <record id="product_pricelist_item_form_view_secondary_currency" model="ir.ui.view">
+        <field name="name">product.pricelist.item.form.secondary.currency</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='fixed_price']" position="before">
+                <field name="secondary_currency_id" invisible="1"/>
+                <label for="secondary_price"
+                       invisible="compute_price != 'fixed' or not secondary_currency_id"/>
+                <div class="o_row" invisible="compute_price != 'fixed' or not secondary_currency_id">
+                    <field name="secondary_price" widget="monetary"
+                           options="{'currency_field': 'secondary_currency_id'}"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='fixed_price']" position="attributes">
+                <attribute name="readonly">secondary_currency_id and secondary_price</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rules list opened from a product -->
+    <record id="product_pricelist_item_tree_view_from_product_secondary" model="ir.ui.view">
+        <field name="name">product.pricelist.item.list.secondary.currency</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="inherit_id" ref="product.product_pricelist_item_tree_view_from_product"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='fixed_price']" position="before">
+                <field name="secondary_currency_id" column_invisible="True"/>
+                <field name="secondary_price" widget="monetary"
+                       options="{'currency_field': 'secondary_currency_id'}"
+                       readonly="not secondary_currency_id"/>
+            </xpath>
+            <xpath expr="//field[@name='fixed_price']" position="attributes">
+                <attribute name="readonly">secondary_currency_id and secondary_price</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
