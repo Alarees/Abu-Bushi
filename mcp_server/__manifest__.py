@@ -81,7 +81,7 @@ the module's legacy XML-RPC endpoints remain available for programmatic/RPC acce
     ],
     "external_dependencies": {
         "python": [
-            "authlib>=1.6.12,<1.7.0",
+            "authlib",
             "defusedxml",
             "packaging",
         ],
