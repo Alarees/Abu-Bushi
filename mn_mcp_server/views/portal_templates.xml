@@ -29,13 +29,13 @@
                     <t t-if="error">
                         <div style="background:#FEF2F2;border:1px solid #FCA5A5;color:#7F1D1D;
                                     border-radius:10px;padding:14px 16px;margin-bottom:20px;">
-                            <t t-esc="error"/>
+                            <t t-out="error"/>
                         </div>
                     </t>
                     <t t-if="info">
                         <div style="background:#F0FDF4;border:1px solid #86EFAC;color:#14532D;
                                     border-radius:10px;padding:14px 16px;margin-bottom:20px;">
-                            <t t-esc="info"/>
+                            <t t-out="info"/>
                         </div>
                     </t>
 
@@ -53,7 +53,7 @@
                             <div style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
                                         font-size:13px;background:#0F1117;color:#E2E8F0;
                                         border-radius:8px;padding:14px;word-break:break-all;">
-                                <t t-esc="new_token"/>
+                                <t t-out="new_token"/>
                             </div>
                             <div style="font-weight:700;color:#0F1117;margin:18px 0 6px;">
                                 Connector URL
@@ -65,7 +65,7 @@
                                         font-size:12px;background:#F1F5F9;color:#0F1117;
                                         border:1px solid #E2E8F0;border-radius:8px;padding:12px;
                                         word-break:break-all;">
-                                <t t-esc="new_connect_url"/>
+                                <t t-out="new_connect_url"/>
                             </div>
                         </div>
                     </t>
@@ -82,7 +82,7 @@
                                 <td style="padding:6px 0;color:#0F1117;font-weight:600;">
                                     <t t-if="template['allowed_models'] == '*'">Everything you can see</t>
                                     <t t-elif="template['allowed_models']">
-                                        <t t-esc="template['allowed_models']"/>
+                                        <t t-out="template['allowed_models']"/>
                                     </t>
                                     <t t-else="">Nothing yet — ask your administrator</t>
                                 </td>
@@ -99,13 +99,13 @@
                             <tr>
                                 <td style="padding:6px 0;">Daily limit</td>
                                 <td style="padding:6px 0;color:#0F1117;font-weight:600;">
-                                    <t t-esc="template['daily_quota']"/> calls
+                                    <t t-out="template['daily_quota']"/> calls
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding:6px 0;">Keys you may hold</td>
                                 <td style="padding:6px 0;color:#0F1117;font-weight:600;">
-                                    <t t-esc="template['max_keys']"/>
+                                    <t t-out="template['max_keys']"/>
                                 </td>
                             </tr>
                         </table>
@@ -149,11 +149,11 @@
                             <div style="display:flex;align-items:center;justify-content:space-between;
                                         gap:12px;border-top:1px solid #F1F5F9;padding:12px 0;">
                                 <div>
-                                    <div style="color:#0F1117;font-weight:600;"><t t-esc="key.name"/></div>
+                                    <div style="color:#0F1117;font-weight:600;"><t t-out="key.name"/></div>
                                     <div style="color:#64748B;font-size:13px;">
-                                        <t t-esc="key.total_calls"/> calls ·
-                                        <t t-esc="key.usage_today"/> today ·
-                                        <t t-if="key.last_used">last used <t t-esc="key.last_used"/></t>
+                                        <t t-out="key.total_calls"/> calls ·
+                                        <t t-out="key.usage_today"/> today ·
+                                        <t t-if="key.last_used">last used <t t-out="key.last_used"/></t>
                                         <t t-else="">never used</t>
                                     </div>
                                 </div>

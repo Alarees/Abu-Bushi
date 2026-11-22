@@ -16,6 +16,7 @@ def post_init_hook(env):
     entirely, which is cheaper than making the lazy path race-free.
     """
     import secrets
+    from .compat import icp_get, icp_set
     params = env["ir.config_parameter"].sudo()
-    if not params.get_param("mn_mcp.confirm_secret"):
-        params.set_param("mn_mcp.confirm_secret", secrets.token_urlsafe(48))
+    if not icp_get(params, "mn_mcp.confirm_secret"):
+        icp_set(params, "mn_mcp.confirm_secret", secrets.token_urlsafe(48))

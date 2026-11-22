@@ -20,12 +20,13 @@ import logging
 from odoo import _, http
 from odoo.exceptions import AccessError
 from odoo.http import request
+from ..compat import icp_get, icp_set
 
 _logger = logging.getLogger(__name__)
 
 
 def _self_service_enabled(env):
-    return env["ir.config_parameter"].sudo().get_param(
+    return icp_get(env["ir.config_parameter"].sudo(), 
         "mn_mcp.self_service", "False") in ("True", "true", "1", True)
 
 
@@ -33,14 +34,14 @@ def _template(env):
     """The ceiling an end user's key is issued against."""
     ICP = env["ir.config_parameter"].sudo()
     return {
-        "allowed_models": ICP.get_param("mn_mcp.self_models", "") or "",
-        "perm_read": ICP.get_param("mn_mcp.self_read", "True") in ("True", "true", "1"),
-        "perm_write": ICP.get_param("mn_mcp.self_write", "False") in ("True", "true", "1"),
-        "perm_create": ICP.get_param("mn_mcp.self_create", "False") in ("True", "true", "1"),
-        "perm_unlink": ICP.get_param("mn_mcp.self_unlink", "False") in ("True", "true", "1"),
-        "daily_quota": int(ICP.get_param("mn_mcp.self_quota", "500") or 500),
-        "rate_per_minute": int(ICP.get_param("mn_mcp.self_rate", "30") or 30),
-        "max_keys": int(ICP.get_param("mn_mcp.self_max_keys", "3") or 3),
+        "allowed_models": icp_get(ICP, "mn_mcp.self_models", "") or "",
+        "perm_read": icp_get(ICP, "mn_mcp.self_read", "True") in ("True", "true", "1"),
+        "perm_write": icp_get(ICP, "mn_mcp.self_write", "False") in ("True", "true", "1"),
+        "perm_create": icp_get(ICP, "mn_mcp.self_create", "False") in ("True", "true", "1"),
+        "perm_unlink": icp_get(ICP, "mn_mcp.self_unlink", "False") in ("True", "true", "1"),
+        "daily_quota": int(icp_get(ICP, "mn_mcp.self_quota", "500") or 500),
+        "rate_per_minute": int(icp_get(ICP, "mn_mcp.self_rate", "30") or 30),
+        "max_keys": int(icp_get(ICP, "mn_mcp.self_max_keys", "3") or 3),
     }
 
 

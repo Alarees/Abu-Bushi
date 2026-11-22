@@ -1,5 +1,5 @@
 /** @odoo-module **/
-import { Component, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, useRef, proxy } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 
@@ -7,7 +7,7 @@ export class McpDashboard extends Component {
     static template = "mn_mcp_server.Dashboard";
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ loading: true, data: null });
+        this.state = proxy({ loading: true, data: null });
         this.canvas = useRef("trend");
         this._timer = null;
         onMounted(async () => {

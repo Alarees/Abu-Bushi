@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models
+from ..compat import icp_get, icp_set
 
 
 class ResConfigSettings(models.TransientModel):
@@ -84,7 +85,7 @@ class ResConfigSettings(models.TransientModel):
     # through a friendly model picker.
     def get_values(self):
         res = super().get_values()
-        csv = self.env["ir.config_parameter"].sudo().get_param("mn_mcp.default_models", "")
+        csv = icp_get(self.env["ir.config_parameter"].sudo(), "mn_mcp.default_models", "")
         names = [m.strip() for m in csv.split(",") if m.strip()]
         models = self.env["ir.model"].search([("model", "in", names)]) if names else self.env["ir.model"]
         res["mcp_default_model_ids"] = [(6, 0, models.ids)]
@@ -93,4 +94,4 @@ class ResConfigSettings(models.TransientModel):
     def set_values(self):
         super().set_values()
         csv = ",".join(sorted(self.mcp_default_model_ids.mapped("model")))
-        self.env["ir.config_parameter"].sudo().set_param("mn_mcp.default_models", csv)
+        icp_set(self.env["ir.config_parameter"].sudo(), "mn_mcp.default_models", csv)

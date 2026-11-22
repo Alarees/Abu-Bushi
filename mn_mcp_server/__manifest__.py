@@ -211,7 +211,7 @@ MENA Odoo shop should have AI access without paying twice.
     "depends": ["base", "mail", "web"],
     "data": [
         "security/mcp_security.xml",
-        "security/ir.model.access.csv",
+        "security/ir.access.csv",
         "data/sequences.xml",
         "data/config_data.xml",
         "data/cron.xml",

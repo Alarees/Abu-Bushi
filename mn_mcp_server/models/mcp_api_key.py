@@ -9,6 +9,7 @@ import hashlib, secrets
 from datetime import date
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from ..compat import icp_get, icp_set
 
 
 class McpApiKey(models.Model):
@@ -29,7 +30,7 @@ class McpApiKey(models.Model):
 
     # Scope
     def _default_allowed_models(self):
-        return self.env["ir.config_parameter"].sudo().get_param(
+        return icp_get(self.env["ir.config_parameter"].sudo(), 
             "mn_mcp.default_models",
             "res.partner,product.template,sale.order,crm.lead,account.move")
 
@@ -112,7 +113,7 @@ class McpApiKey(models.Model):
         # 2) otherwise auto-detect: the exact host the admin is browsing right
         #    now (so the link always matches THIS database/instance);
         # 3) fall back to the configured base URL.
-        public = (ICP.get_param("mn_mcp.public_url") or "").strip().rstrip("/")
+        public = (icp_get(ICP, "mn_mcp.public_url") or "").strip().rstrip("/")
         if public:
             url = public
         else:
@@ -123,7 +124,7 @@ class McpApiKey(models.Model):
             except Exception:
                 base = ""
             if not base:
-                base = (ICP.get_param("web.base.url") or "").rstrip("/")
+                base = (icp_get(ICP, "web.base.url") or "").rstrip("/")
             url = (base + "/mcp") if base else "/mcp"
         for r in self:
             tok = r.token or "PASTE-YOUR-TOKEN-HERE"

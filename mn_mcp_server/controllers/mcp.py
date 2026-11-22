@@ -15,12 +15,13 @@ from odoo.http import request
 from . import confirm as C
 from . import protocol as P
 from ..models.mcp_engine import McpForbidden
+from ..compat import icp_get, icp_set
 
 _logger = logging.getLogger(__name__)
 
 JSONRPC = "2.0"
 # Kept for the module version string reported to clients.
-SERVER_VERSION = "19.0.4.0.0"
+SERVER_VERSION = "20.0.4.0.0"
 
 
 def _err(code, message, rpc_id=None, data=None):
@@ -48,7 +49,7 @@ class McpController(http.Controller):
             ])
 
         env = request.env(su=True)
-        enabled = env["ir.config_parameter"].get_param(
+        enabled = icp_get(env["ir.config_parameter"], 
             "mn_mcp.enabled", "True") in ("True", "true", "1", True)
         if not enabled:
             return self._respond(_err(P.ERR_DISABLED, "MCP endpoint disabled"), status=503)

@@ -12,6 +12,7 @@ import json
 
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests import HttpCase, TransactionCase, tagged
+from ..compat import icp_get, icp_set
 
 
 class _KeyMixin:
@@ -436,16 +437,16 @@ class TestSelfService(HttpCase):
         cls.env.ref("mn_mcp_server.group_mcp_user").sudo().write({
             "user_ids": [(4, cls.user.id)]})
         ICP = cls.env["ir.config_parameter"].sudo()
-        ICP.set_param("mn_mcp.self_service", "True")
-        ICP.set_param("mn_mcp.self_models", "res.partner")
-        ICP.set_param("mn_mcp.self_write", "False")
-        ICP.set_param("mn_mcp.self_max_keys", "1")
+        icp_set(ICP, "mn_mcp.self_service", "True")
+        icp_set(ICP, "mn_mcp.self_models", "res.partner")
+        icp_set(ICP, "mn_mcp.self_write", "False")
+        icp_set(ICP, "mn_mcp.self_max_keys", "1")
 
     def test_disabled_by_default_is_refused(self):
         from ..controllers.portal import _self_service_enabled
-        self.env["ir.config_parameter"].sudo().set_param("mn_mcp.self_service", "False")
+        icp_set(self.env["ir.config_parameter"].sudo(), "mn_mcp.self_service", "False")
         self.assertFalse(_self_service_enabled(self.env))
-        self.env["ir.config_parameter"].sudo().set_param("mn_mcp.self_service", "True")
+        icp_set(self.env["ir.config_parameter"].sudo(), "mn_mcp.self_service", "True")
 
     def test_the_template_is_the_ceiling(self):
         """A user posting perm_write=1 still gets a read-only key."""

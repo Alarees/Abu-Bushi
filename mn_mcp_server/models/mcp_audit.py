@@ -3,6 +3,7 @@
 for what the AI did — required for compliance + safety review."""
 import hashlib, json
 from odoo import api, fields, models
+from ..compat import icp_get, icp_set
 
 
 class McpAudit(models.Model):
@@ -37,7 +38,7 @@ class McpAudit(models.Model):
     def _cron_cleanup(self):
         """Delete audit entries older than configured retention."""
         from datetime import timedelta
-        days = int(self.env["ir.config_parameter"].sudo().get_param(
+        days = int(icp_get(self.env["ir.config_parameter"].sudo(), 
             "mn_mcp.audit_retention", "90"))
         cutoff = fields.Datetime.now() - timedelta(days=days)
         old = self.sudo().search([("create_date", "<", cutoff)])

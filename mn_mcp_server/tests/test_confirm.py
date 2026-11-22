@@ -8,6 +8,7 @@ larger action, forging the state, or answering "no" and having it run anyway.
 import json
 
 from odoo.tests import HttpCase, tagged
+from ..compat import icp_get, icp_set
 
 
 @tagged("post_install", "-at_install")
@@ -149,18 +150,18 @@ class TestConfirm(HttpCase):
         self.assertEqual(result["resultType"], "complete")
 
     def test_bulk_write_over_threshold_is_gated(self):
-        self.env["ir.config_parameter"].sudo().set_param("mn_mcp.confirm_write_over", "2")
+        icp_set(self.env["ir.config_parameter"].sudo(), "mn_mcp.confirm_write_over", "2")
         ids = [self._partner(f"Bulk {i}") for i in range(4)]
         result = self._call("odoo_write", {"model": "res.partner", "ids": ids,
                                            "values": {"comment": "bulk"}})
         self.assertEqual(result["resultType"], "input_required")
 
     def test_guard_can_be_switched_off(self):
-        self.env["ir.config_parameter"].sudo().set_param("mn_mcp.confirm_enabled", "False")
+        icp_set(self.env["ir.config_parameter"].sudo(), "mn_mcp.confirm_enabled", "False")
         pid = self._partner()
         result = self._call("odoo_unlink", {"model": "res.partner", "ids": [pid]})
         self.assertEqual(result["resultType"], "complete")
-        self.env["ir.config_parameter"].sudo().set_param("mn_mcp.confirm_enabled", "True")
+        icp_set(self.env["ir.config_parameter"].sudo(), "mn_mcp.confirm_enabled", "True")
 
     def test_guarded_tools_advertise_the_confirm_argument(self):
         response = self.url_open("/mcp", data=json.dumps({

@@ -16,6 +16,7 @@ import json
 import logging
 
 from odoo import _, api, fields, models
+from ..compat import icp_get, icp_set
 
 _logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ class McpEngine(models.AbstractModel):
     # ─────────────────────────────────────────────────────────────────
     @api.model
     def max_records(self):
-        return int(self.env["ir.config_parameter"].sudo().get_param(
+        return int(icp_get(self.env["ir.config_parameter"].sudo(), 
             "mn_mcp.max_records", "100"))
 
     # ─────────────────────────────────────────────────────────────────

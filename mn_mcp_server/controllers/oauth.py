@@ -20,6 +20,7 @@ from odoo.exceptions import ValidationError
 from odoo.http import request
 
 from ..models.mcp_oauth import DEFAULT_SCOPE, SCOPES, SCOPES_SUPPORTED
+from ..compat import icp_get, icp_set
 
 _logger = logging.getLogger(__name__)
 
@@ -34,14 +35,13 @@ def base_url():
     web.base.url produces discovery documents that point somewhere the client
     cannot reach. ``mn_mcp.public_url`` overrides when the guess is wrong.
     """
-    override = request.env["ir.config_parameter"].sudo().get_param("mn_mcp.public_url")
+    override = icp_get(request.env["ir.config_parameter"].sudo(), "mn_mcp.public_url")
     if override:
         return override.rstrip("/")
     host = (request.httprequest.host_url or "").rstrip("/")
     if host:
         return host
-    return (request.env["ir.config_parameter"].sudo()
-            .get_param("web.base.url", "")).rstrip("/")
+    return (icp_get(request.env["ir.config_parameter"].sudo(), "web.base.url", "")).rstrip("/")
 
 
 def _json(payload, status=200, headers=None):
@@ -240,7 +240,7 @@ class McpOauth(http.Controller):
                 methods=["POST", "OPTIONS"], csrf=False, cors="*",
                 save_session=False)
     def register(self, **kw):
-        enabled = request.env["ir.config_parameter"].sudo().get_param(
+        enabled = icp_get(request.env["ir.config_parameter"].sudo(), 
             "mn_mcp.oauth_allow_dcr", "True") in ("True", "true", "1")
         if not enabled:
             return _oauth_error("invalid_request",

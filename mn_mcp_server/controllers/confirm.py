@@ -37,6 +37,7 @@ import json
 import time
 
 from . import protocol as P
+from ..compat import icp_get, icp_set
 
 # Operations that are never silently executed.
 ALWAYS_CONFIRM = {"odoo_unlink"}
@@ -57,7 +58,7 @@ CONFIRM_KEY = "mcp_confirm"          # key of the elicitation in inputRequests
 def _secret(env):
     """A per-database signing secret, distinct from Odoo's session secret."""
     params = env["ir.config_parameter"].sudo()
-    secret = params.get_param("mn_mcp.confirm_secret")
+    secret = icp_get(params, "mn_mcp.confirm_secret")
     if not secret:
         # Install mints this ahead of time (see the module's post_init_hook).
         # This lazy path is the upgrade case, and it re-reads after writing:
@@ -66,8 +67,8 @@ def _secret(env):
         # a secret that loses the race hands the client a confirmation the
         # server will not recognise a moment later.
         import secrets as _s
-        params.set_param("mn_mcp.confirm_secret", _s.token_urlsafe(48))
-        secret = params.get_param("mn_mcp.confirm_secret")
+        icp_set(params, "mn_mcp.confirm_secret", _s.token_urlsafe(48))
+        secret = icp_get(params, "mn_mcp.confirm_secret")
     return secret.encode()
 
 
@@ -119,7 +120,7 @@ def verify_state(env, state, api_key, tool, arguments):
 # Policy
 # ----------------------------------------------------------------------
 def _param(env, name, default):
-    return env["ir.config_parameter"].sudo().get_param(f"mn_mcp.{name}", default)
+    return icp_get(env["ir.config_parameter"].sudo(), f"mn_mcp.{name}", default)
 
 
 def _enabled(env):
