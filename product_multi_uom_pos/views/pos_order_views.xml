@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Display the selected packaging in POS order lines -->
+    <record id="view_pos_pos_form" model="ir.ui.view">
+        <field name="name">pos.order.view.form.inherit.product.multi.uom.pos</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="model">pos.order</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lines']/list/field[@name='product_id']" position="after">
+                <field name="custom_uom_name" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
