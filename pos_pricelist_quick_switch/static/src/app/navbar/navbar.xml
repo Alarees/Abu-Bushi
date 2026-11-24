@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_pricelist_quick_switch.Navbar" t-inherit="point_of_sale.Navbar" t-inherit-mode="extension">
+        <xpath expr="//Input" position="before">
+            <t t-if="this.showPricelistSwitcher">
+                <div t-if="!this.ui.isSmall" class="o_pricelist_quick_switch btn-group flex-shrink-1 min-w-0 me-2" role="group" aria-label="Pricelists">
+                    <button t-foreach="this.quickPricelists" t-as="item" t-key="item.id"
+                            type="button"
+                            class="o_pricelist_quick_button btn btn-lg lh-lg text-nowrap"
+                            t-att-class="this.isQuickPricelistActive(item) ? 'btn-primary active' : 'btn-outline-secondary'"
+                            t-on-click="() => this.onClickQuickPricelist(item)">
+                        <t t-out="item.name"/>
+                    </button>
+                </div>
+                <select t-else="" class="o_pricelist_quick_select form-select w-auto mw-50 me-1"
+                        aria-label="Pricelists"
+                        t-on-change="(ev) => this.onChangeQuickPricelist(ev)">
+                    <option t-foreach="this.quickPricelists" t-as="item" t-key="item.id"
+                            t-att-value="item.id || ''"
+                            t-att-selected="this.isQuickPricelistActive(item)">
+                        <t t-out="item.name"/>
+                    </option>
+                </select>
+            </t>
+        </xpath>
+    </t>
+</templates>

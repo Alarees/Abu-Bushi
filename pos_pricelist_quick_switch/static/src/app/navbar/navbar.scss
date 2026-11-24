@@ -1,0 +1,9 @@
+.o_pricelist_quick_switch {
+    max-width: 45vw;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
