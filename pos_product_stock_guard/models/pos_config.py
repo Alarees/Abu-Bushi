@@ -19,6 +19,11 @@ class PosConfig(models.Model):
         string='Show Stock on Products',
         default=True,
         help="Show the available quantity in a corner of every storable product card.")
+    pricelist_price_show = fields.Boolean(
+        string='Show Pricelist Price on Products',
+        default=True,
+        help="Show the sale price of the product, computed from the pricelist selected on the "
+             "current order, at the bottom of every product card.")
     stock_guard_qty_type = fields.Selection(
         [('on_hand', 'On Hand'), ('free', 'Free to Use'), ('forecast', 'Forecasted')],
         string='Quantity Shown',

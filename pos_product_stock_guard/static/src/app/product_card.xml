@@ -7,6 +7,10 @@
                   class="o_stock_guard_badge position-absolute top-0 start-0 m-1 px-2 rounded-pill fw-bold"
                   t-att-class="guardQty > 0 ? 'o_stock_guard_in' : 'o_stock_guard_out'"
                   t-out="this.stockGuardQtyText"/>
+            <t t-set="pricelistPrice" t-value="this.pricelistPriceText"/>
+            <span t-if="pricelistPrice !== null"
+                  class="o_pricelist_price_badge position-absolute bottom-0 start-0 m-1 px-2 rounded fw-bold text-nowrap"
+                  t-out="pricelistPrice"/>
         </xpath>
     </t>
 </templates>

@@ -21,6 +21,10 @@
                         </div>
                     </div>
                 </setting>
+                <setting id="pos_pricelist_price_display_setting" string="Pricelist Price on Product Cards"
+                         help="Show the sale price from the pricelist selected on the order at the bottom of every product card.">
+                    <field name="pos_pricelist_price_show"/>
+                </setting>
                 <setting id="pos_stock_guard_mode_setting" string="Out-of-Stock Products"
                          help="What happens when a cashier sells more than is available.">
                     <field name="pos_stock_guard_mode" widget="radio" required="pos_config_id"/>
