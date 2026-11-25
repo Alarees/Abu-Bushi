@@ -25,6 +25,16 @@ class ProductPricelist(models.Model):
              "(1 = nearest whole number).",
     )
 
+    adjust_percent = fields.Float(
+        string="Adjustment %",
+        help="Percentage added to the converted price (secondary price x rate), "
+             "before rounding. Use a negative value for a discount.",
+    )
+    adjust_amount = fields.Float(
+        string="Adjustment Amount",
+        help="Amount (in the pricelist currency) added after the percentage, before rounding. "
+             "Use a negative value to subtract.",
+    )
     sync_list_price = fields.Boolean(
         string="Update Product Sale Price",
         help="When enabled, the product Sales Price is kept equal to the fixed price of the "
@@ -33,7 +43,10 @@ class ProductPricelist(models.Model):
              "its currency must be the company currency.",
     )
 
-    _SYNC_TRIGGER_FIELDS = {'secondary_currency_id', 'currency_id', 'secondary_rounding'}
+    _SYNC_TRIGGER_FIELDS = {
+        'secondary_currency_id', 'currency_id', 'secondary_rounding',
+        'adjust_percent', 'adjust_amount',
+    }
 
     @api.constrains('sync_list_price', 'company_id', 'currency_id')
     def _check_sync_list_price(self):
@@ -74,6 +87,12 @@ class ProductPricelist(models.Model):
                     "The secondary currency must be different from the pricelist currency."
                 ))
 
+    @api.constrains('adjust_percent')
+    def _check_adjust_percent(self):
+        for pricelist in self:
+            if pricelist.adjust_percent <= -100:
+                raise ValidationError(self.env._("The adjustment percentage must be greater than -100."))
+
     @api.constrains('secondary_rounding')
     def _check_secondary_rounding(self):
         for pricelist in self:
@@ -112,8 +131,11 @@ class ProductPricelist(models.Model):
                 lambda i: i.compute_price == 'fixed' and not i.secondary_price and i.fixed_price
             )
             for item in items:
+                # Reverse the adjustment: fixed = converted x (1 + %) + amount
+                percent, amount = item._get_adjustment()
+                converted = (item.fixed_price - amount) / (1 + percent / 100.0)
                 item.secondary_price = float_round(
-                    item.fixed_price / rate,
+                    converted / rate,
                     precision_rounding=pricelist.secondary_currency_id.rounding,
                 )
         return True

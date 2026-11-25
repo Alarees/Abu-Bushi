@@ -9,13 +9,15 @@ Pricelist Secondary Currency
 * Fixed-price rules get a "Secondary Price" field; the fixed price in the
   pricelist currency is computed = secondary price x current exchange rate,
   rounded to the pricelist's secondary rounding (default: nearest whole number).
+* An adjustment (percentage then amount) is applied after the conversion and before
+  rounding; defined on the pricelist, with an optional per-rule override.
 * When an exchange rate (res.currency.rate) is created, edited or deleted,
   all affected rules are recalculated automatically.
 * A daily cron also refreshes prices (covers future-dated rates).
 * Optional: one pricelist per company can push its fixed prices to the product
   Sales Price (instantly on change, with a button and the daily cron).
 """,
-    'version': '20.0.1.1.0',
+    'version': '20.0.1.2.0',
     'category': 'Sales/Sales',
     'license': 'LGPL-3',
     'author': 'Abu Bushi',

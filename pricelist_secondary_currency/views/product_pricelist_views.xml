@@ -10,6 +10,8 @@
                 <field name="secondary_currency_id" options="{'no_create': True}"/>
                 <field name="secondary_rate" invisible="not secondary_currency_id"/>
                 <field name="secondary_rounding" invisible="not secondary_currency_id"/>
+                <field name="adjust_percent" invisible="not secondary_currency_id"/>
+                <field name="adjust_amount" invisible="not secondary_currency_id"/>
                 <field name="sync_list_price"/>
                 <div colspan="2" invisible="not secondary_currency_id">
                     <button name="action_update_secondary_prices" type="object"
@@ -46,6 +48,28 @@
                 <div class="o_row" invisible="compute_price != 'fixed' or not secondary_currency_id">
                     <field name="secondary_price" widget="monetary"
                            options="{'currency_field': 'secondary_currency_id'}"/>
+                </div>
+                <field name="currency_id" invisible="1"/>
+                <label for="converted_price"
+                       invisible="compute_price != 'fixed' or not secondary_currency_id"/>
+                <div class="o_row" invisible="compute_price != 'fixed' or not secondary_currency_id">
+                    <field name="converted_price" widget="monetary"
+                           options="{'currency_field': 'currency_id'}"/>
+                </div>
+                <label for="custom_adjustment"
+                       invisible="compute_price != 'fixed' or not secondary_currency_id"/>
+                <div class="o_row" invisible="compute_price != 'fixed' or not secondary_currency_id">
+                    <field name="custom_adjustment"/>
+                </div>
+                <label for="adjust_percent"
+                       invisible="compute_price != 'fixed' or not secondary_currency_id or not custom_adjustment"/>
+                <div class="o_row" invisible="compute_price != 'fixed' or not secondary_currency_id or not custom_adjustment">
+                    <field name="adjust_percent"/> %
+                </div>
+                <label for="adjust_amount"
+                       invisible="compute_price != 'fixed' or not secondary_currency_id or not custom_adjustment"/>
+                <div class="o_row" invisible="compute_price != 'fixed' or not secondary_currency_id or not custom_adjustment">
+                    <field name="adjust_amount"/>
                 </div>
             </xpath>
             <xpath expr="//field[@name='fixed_price']" position="attributes">
